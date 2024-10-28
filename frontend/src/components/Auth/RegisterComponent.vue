@@ -1,0 +1,80 @@
+<template>
+  <div>
+    <h2>Register</h2>
+    <form @submit.prevent="register">
+      <div class="input">
+        <label for="username" class="label">Username:</label>
+        <input
+          id="username"
+          v-model="username"
+          aria-label="Username"
+          required
+        />
+      </div>
+      <div class="input">
+        <label for="password" class="label">Password:</label>
+        <input
+          :type="showPassword ? 'text' : 'password'"
+          v-model="password"
+          id="password"
+          required
+          aria-label="Password"
+        />
+        <button type="button" @click="togglePassword">Show Password</button>
+      </div>
+      <button type="submit" class="button">Register</button>
+      <p v-if="error" class="feedback">{{ error }}</p>
+    </form>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
+import axios from 'axios'
+
+export default defineComponent({
+  name: 'RegisterComponent',
+  emits: ['registered'],
+  setup(_, { emit }) {
+    const username = ref('')
+    const password = ref('')
+    const showPassword = ref(false)
+    const error = ref('')
+
+    const register = async () => {
+      try {
+        const response = await axios.post('/auth/register', {
+          username: username.value,
+          password: password.value,
+        })
+        const accessToken = response.data.access_token
+        localStorage.setItem('accessToken', accessToken)
+        localStorage.setItem('username', username.value)
+        emit('registered')
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const status = err.response?.status
+          if (status === 409) {
+            error.value = 'Username already exists.'
+          } else {
+            error.value = 'An unexpected error occurred.'
+          }
+        }
+      }
+    }
+
+    const togglePassword = () => {
+      showPassword.value = !showPassword.value
+    }
+
+    return {
+      username,
+      password,
+      showPassword,
+      error,
+      register,
+      togglePassword,
+    }
+  },
+})
+</script>
