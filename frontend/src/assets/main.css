@@ -27,7 +27,9 @@ a:hover {
   color: var(--secondary-color);
 }
 
-button, input[type="button"], input[type="submit"] {
+button,
+input[type='button'],
+input[type='submit'] {
   background-color: var(--primary-color);
   color: white;
   border: none;
@@ -38,11 +40,14 @@ button, input[type="button"], input[type="submit"] {
   transition: background-color var(--transition-speed);
 }
 
-button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+button:hover,
+input[type='button']:hover,
+input[type='submit']:hover {
   background-color: var(--secondary-color);
 }
 
-header, footer {
+header,
+footer {
   background-color: var(--primary-color);
   color: white;
   padding: 1rem;
@@ -53,7 +58,12 @@ section {
   padding: 2rem;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--primary-color);
 }
 
@@ -70,20 +80,30 @@ blockquote {
   border-radius: var(--border-radius);
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   padding: 0.5rem;
   border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius);
   transition: border-color var(--transition-speed);
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   border-color: var(--primary-color);
   outline: none;
 }
 
 /* Traditional Semantic HTML Elements */
-article, aside, nav, section, footer, header, main {
+article,
+aside,
+nav,
+section,
+footer,
+header,
+main {
   background-color: var(--bg-color);
   padding: 2rem;
   margin-bottom: 1.5rem;
@@ -111,7 +131,8 @@ main {
   padding: 2rem;
 }
 
-footer, header {
+footer,
+header {
   background-color: var(--primary-color);
   color: white;
 }
@@ -156,7 +177,8 @@ table {
   margin-bottom: 1rem;
 }
 
-th, td {
+th,
+td {
   padding: 0.75rem;
   border: 1px solid var(--secondary-color);
   text-align: left;
@@ -198,12 +220,14 @@ cite {
   color: var(--tertiary-color);
 }
 
-b, strong {
+b,
+strong {
   font-weight: bold;
   color: var(--primary-color);
 }
 
-i, em {
+i,
+em {
   font-style: italic;
   color: var(--secondary-color);
 }
@@ -223,7 +247,8 @@ ins {
   text-decoration-color: var(--tertiary-color);
 }
 
-sup, sub {
+sup,
+sub {
   font-size: 0.8em;
   vertical-align: super;
 }
@@ -238,7 +263,15 @@ small {
 }
 
 /* Additional Input Elements */
-input[type="text"], input[type="email"], input[type="password"], input[type="url"], input[type="tel"], input[type="number"], input[type="search"], input[type="date"], input[type="time"] {
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='url'],
+input[type='tel'],
+input[type='number'],
+input[type='search'],
+input[type='date'],
+input[type='time'] {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--secondary-color);
@@ -247,12 +280,21 @@ input[type="text"], input[type="email"], input[type="password"], input[type="url
   transition: border-color var(--transition-speed);
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="url"]:focus, input[type="tel"]:focus, input[type="number"]:focus, input[type="search"]:focus, input[type="date"]:focus, input[type="time"]:focus {
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='url']:focus,
+input[type='tel']:focus,
+input[type='number']:focus,
+input[type='search']:focus,
+input[type='date']:focus,
+input[type='time']:focus {
   border-color: var(--primary-color);
   outline: none;
 }
 
-input[type="checkbox"], input[type="radio"] {
+input[type='checkbox'],
+input[type='radio'] {
   margin-right: 0.5rem;
   accent-color: var(--primary-color);
 }
@@ -271,7 +313,7 @@ select:focus {
   outline: none;
 }
 
-input[type="range"] {
+input[type='range'] {
   width: 100%;
   -webkit-appearance: none;
   appearance: none;
@@ -280,7 +322,7 @@ input[type="range"] {
   border-radius: var(--border-radius);
 }
 
-input[type="range"]::-webkit-slider-thumb {
+input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 20px;
@@ -290,7 +332,7 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
-input[type="range"]::-moz-range-thumb {
+input[type='range']::-moz-range-thumb {
   width: 20px;
   height: 20px;
   background-color: var(--primary-color);
@@ -298,7 +340,7 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
-input[type="file"] {
+input[type='file'] {
   padding: 0.5rem;
   border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius);
@@ -306,7 +348,7 @@ input[type="file"] {
   transition: border-color var(--transition-speed);
 }
 
-input[type="file"]:focus {
+input[type='file']:focus {
   border-color: var(--primary-color);
   outline: none;
 }
@@ -375,8 +417,7 @@ fieldset {
 
 legend {
   font-weight: bold;
-  padding: 0 
-  0.5rem;
+  padding: 0 0.5rem;
   color: var(--primary-color);
 }
 
