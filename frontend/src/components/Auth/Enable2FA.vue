@@ -14,26 +14,28 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import axios from 'axios'
+import { AuthError, OtpSetup, enable2fa } from  '@/services/authService';
+import { useAuthStore } from '@/stores/authStore';
+
 
 export default defineComponent({
   name: 'Enable2FA',
   setup() {
+    const authStore =  useAuthStore();
     const provisioningUri = ref('')
     const qrCodeBase64 = ref('')
     const error = ref('')
 
     const enable2FA = async () => {
       try {
-        const token = localStorage.getItem('accessToken') // Retrieve stored token
-        const response = await axios.post('/auth/enable-2fa', null, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        provisioningUri.value = response.data.provisioning_uri
-        qrCodeBase64.value = response.data.qr_code_base64
+        const otpSetup:OtpSetup = await enable2fa(authStore.getTokenStr);
+        provisioningUri.value = otpSetup.provisioningUri;
+        qrCodeBase64.value = otpSetup.qrCodeBase64;
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          error.value = 'An unexpected error occurred while enabling 2FA.'
+        if (err instanceof AuthError) {
+          error.value = err.message;
+        } else {
+          throw new Error('Unexpected error');
         }
       }
     }

@@ -30,12 +30,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
+import { AuthError, registerUser, Token } from '@/services/authService';
 
 export default defineComponent({
   name: 'RegisterComponent',
   emits: ['registered'],
   setup(_, { emit }) {
+    const authStore = useAuthStore();
     const username = ref('')
     const password = ref('')
     const showPassword = ref(false)
@@ -43,25 +45,18 @@ export default defineComponent({
 
     const register = async () => {
       try {
-        const response = await axios.post('/auth/register', {
-          username: username.value,
-          password: password.value,
-        })
-        const accessToken = response.data.access_token
-        localStorage.setItem('accessToken', accessToken)
-        localStorage.setItem('username', username.value)
+        const token: Token = await registerUser(username.value,password.value);
+        authStore.token = token;
+        authStore.username = username.value;
         emit('registered')
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          const status = err.response?.status
-          if (status === 409) {
-            error.value = 'Username already exists.'
-          } else {
-            error.value = 'An unexpected error occurred.'
-          }
+        if (err instanceof AuthError) {
+          error.value = err.message
+         } else {
+          throw  err
+         }
         }
       }
-    }
 
     const togglePassword = () => {
       showPassword.value = !showPassword.value

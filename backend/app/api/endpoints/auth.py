@@ -3,8 +3,12 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ...db import crud
 from ...db.models import User
-from ...db.schemas.auth import UserCreate, Token, TokenWith2FA
-from ...core.security import create_access_token, get_current_user, validate_otp, generate_totp_provisioning_uri, generate_totp_qr_b64, generate_totp_secret
+from ...db.schemas.auth import UserCreate, Token, TokenWith2FA, UserPwChange
+from ...core.security import (
+    create_access_token, get_current_user_no_otp, 
+    get_current_user, validate_otp, generate_totp_provisioning_uri, 
+    generate_totp_qr_b64, generate_totp_secret
+)
 from ...db.database import get_db
 from fastapi.responses import JSONResponse
 
@@ -49,7 +53,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
               If 2FA is required, an empty token is returned with `requires_2fa` set to True.
               If 2FA is not required, a valid token is returned with `requires_2fa` set to False.
     """
-    print(form_data)
+    print('form data',form_data)
     # Authenticate the user
     user = crud.get_user(db, form_data.username)
     if not user or not crud.verify_password(form_data.password, user.hashed_password):
@@ -85,7 +89,7 @@ def verify_2fa(username: str, otp: str, db: Session = Depends(get_db)):
 
 
 @router.post("/enable-2fa")
-def enable_2fa(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def enable_2fa(db: Session = Depends(get_db), current_user: User = Depends(get_current_user_no_otp)):
     user = crud.get_user(db, current_user.username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -100,3 +104,35 @@ def enable_2fa(db: Session = Depends(get_db), current_user: User = Depends(get_c
     img_str = generate_totp_qr_b64(provisioning_uri)
     
     return JSONResponse(content={"provisioning_uri": provisioning_uri, "qr_code_base64": img_str})
+
+@router.post("/disable-2fa")
+def disable_2fa(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    user = crud.get_user(db, current_user.username)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if user.totp_secret:
+        user.totp_secret = None
+        db.commit()
+
+@router.post("/change-password", response_model=Token)
+def change_password(password_change_form:UserPwChange, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    user = crud.get_user(db, current_user.username)
+    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Check old password
+    if not crud.verify_password(password_change_form.old_password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    crud.change_password(db=db, username=current_user.username, new_password=password_change_form.new_password)
+
+    # Generate new JWT token
+    access_token = create_access_token(data={"sub": current_user.username})
+    
+    # TODO: revoke old refresh token
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+    
+

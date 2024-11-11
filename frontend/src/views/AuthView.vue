@@ -4,8 +4,12 @@
       <button @click="step = 'register'">Sign Up</button>
       <button @click="step = 'login'">Log In</button>
     </div>
-    <div v-else>
+    <div v-else-if="step !=='authenticated'">
       <button @click="step = 'choose'">Back</button>
+    </div>
+    <div v-else>
+      <button @click="handleAccount()">Account</button>
+      <button @click="logOut()">Log Out</button>
     </div>
     <RegisterComponent
       v-if="step === 'register'"
@@ -26,6 +30,7 @@ import RegisterComponent from '@/components/Auth/RegisterComponent.vue'
 import LoginComponent from '@/components/Auth/LoginComponent.vue'
 import Enable2FA from '@/components/Auth/Enable2FA.vue'
 import Verify2FA from '@/components/Auth/Verify2FA.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 export default defineComponent({
   name: 'AuthView',
@@ -37,11 +42,12 @@ export default defineComponent({
   },
   setup() {
     const step = ref<
-      'choose' | 'register' | 'login' | 'verify2fa' | 'enable2fa' | 'setup2fa'
+      'choose' | 'register' | 'login' | 'verify2fa' | 'enable2fa' | 'setup2fa' | 'authenticated'
     >('choose')
 
+    const authStore = useAuthStore();
+
     const handleRegistrationSuccess = () => {
-      alert('Registration successful! You can now log in.')
       step.value = 'login'
     }
 
@@ -53,8 +59,17 @@ export default defineComponent({
       }
     }
 
+    const handleAccount = () => {
+      alert(`you are ${authStore.username}.`)
+    }
+
     const handleVerified = () => {
-      alert('You are logged in with 2FA!')
+      step.value = 'authenticated';
+    }
+
+    const logOut = () => {
+      authStore.logout();
+      step.value = 'choose';
     }
 
     return {
@@ -62,6 +77,8 @@ export default defineComponent({
       handleRegistrationSuccess,
       handleLoginSuccess,
       handleVerified,
+      handleAccount,
+      logOut
     }
   },
 })

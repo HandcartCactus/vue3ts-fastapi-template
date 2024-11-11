@@ -14,7 +14,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
+import { verify2fa, Token, AuthError } from '@/services/authService';
 
 export default defineComponent({
   name: 'Verify2FA',
@@ -23,25 +24,22 @@ export default defineComponent({
     const otp = ref('')
     const error = ref('')
 
+    const authStore = useAuthStore();
+
+
     const verify2FA = async () => {
       try {
-        const response = await axios.post('/auth/verify-2fa', {
-          username: localStorage.getItem('username'), // Ensure this is dynamically set to the current username
-          otp: otp.value,
-        })
-        const accessToken = response.data.access_token
-        localStorage.setItem('accessToken', accessToken) // Save token
-        emit('verified') // Indicate successful verification
+        if (authStore.username == null) {
+          throw new AuthError('Username not found')
+        }
+        const token:Token = await verify2fa(authStore.username, otp.value);
+        authStore.token = token;
+        emit('verified');
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          const status = err.response?.status
-          if (status === 401) {
-            error.value = 'Invalid 2FA code.'
-          } else if (status === 404) {
-            error.value = '2FA not enabled for this user.'
-          } else {
-            error.value = 'An unexpected error occurred.'
-          }
+        if (err instanceof AuthError) {
+          error.value = err.message;
+        } else {
+          error.value = 'An unexpected error occurred.';
         }
       }
     }

@@ -68,6 +68,34 @@ def get_current_user(
 
     return user
 
+# Function to get the current authenticated user
+def get_current_user_no_otp(
+    token: str = Depends(oauth2_scheme), 
+    db: Session = Depends(get_db),
+    otp: str | None = None  # Optional OTP parameter for 2FA
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        # Decode and verify JWT
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    # Retrieve user from database
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise credentials_exception
+
+    return user
+
 def generate_totp_secret() -> str:
     return pyotp.random_base32()
 

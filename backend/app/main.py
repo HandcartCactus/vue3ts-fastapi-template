@@ -4,10 +4,21 @@ from .db import models
 from .db.database import engine
 from fastapi.security import OAuth2PasswordBearer
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 # Create the database tables
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this list with allowed origins for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Point OAuth2PasswordBearer to /auth/token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
